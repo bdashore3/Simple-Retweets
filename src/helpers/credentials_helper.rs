@@ -8,6 +8,7 @@ use fs::File;
 pub struct Credentials {
     pub consumer_key: String,
     pub consumer_secret: String,
+    pub rt_delay: Option<u64>,
     pub access_key: Option<String>,
     pub access_token: Option<String>,
     pub username: Option<String>,

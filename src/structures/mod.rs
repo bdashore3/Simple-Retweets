@@ -5,7 +5,8 @@ use auth::access_token;
 pub struct Config {
     pub token: Token,
     pub user_id: u64,
-    pub screen_name: String
+    pub screen_name: String,
+    pub rt_delay: u64
 }
 
 impl Config {
@@ -25,11 +26,12 @@ impl Config {
 
         let user_id: u64;
         let username: String;
+        let rt_delay = creds.rt_delay.unwrap_or(180);
         let token: Token;
 
         if creds.access_key.is_some() {
-            username = creds.username.unwrap();
             user_id = creds.user_id.unwrap();
+            username = creds.username.unwrap();
 
             let access_token = KeyPair::new(
                 creds.access_token.unwrap(),
@@ -53,7 +55,8 @@ impl Config {
                 Some(Config {
                     token: token,
                     user_id: user_id,
-                    screen_name: username
+                    screen_name: username,
+                    rt_delay: rt_delay
                 })
             }
         } else {
@@ -79,7 +82,8 @@ impl Config {
             Some(Config {
                 token: token,
                 user_id: user_id,
-                screen_name: username
+                screen_name: username,
+                rt_delay: rt_delay
             })
         }
     }
