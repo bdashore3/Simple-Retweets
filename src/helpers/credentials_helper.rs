@@ -8,13 +8,15 @@ use fs::File;
 pub struct Credentials {
     pub consumer_key: String,
     pub consumer_secret: String,
-    pub rt_delay: Option<u64>,
     pub access_key: Option<String>,
     pub access_token: Option<String>,
     pub username: Option<String>,
-    pub user_id: Option<u64>
+    pub user_id: Option<u64>,
+    pub rt_delay: Option<u64>,
+    pub page_size: Option<i32>
 }
 
+// Read the persistent information from info.json
 pub fn read_creds(path: &str) -> Result<Credentials, Box<dyn std::error::Error>> {
     let file = fs::File::open(path)?;
     let reader = BufReader::new(file);
@@ -24,6 +26,7 @@ pub fn read_creds(path: &str) -> Result<Credentials, Box<dyn std::error::Error>>
     Ok(info)
 }
 
+// If there's a new set of user credentials, this adds them to the info.json for the next run
 pub fn add_extra_creds(path: &str, token: &Token, user_id: &u64, username: &str) -> Result<(), Box<dyn std::error::Error>> {
     let mut creds = read_creds(path).unwrap();
 

@@ -60,20 +60,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f9a06fb2e53271d7c279ec1efea6ab691c35a2ae67ec0d91d7acec0caf13b518"
 
 [[package]]
-name = "ccg_rts"
-version = "0.1.0"
-dependencies = [
- "dashmap",
- "egg-mode",
- "log",
- "once_cell",
- "pretty_env_logger",
- "serde",
- "serde_json",
- "tokio",
-]
-
-[[package]]
 name = "cfg-if"
 version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -845,6 +831,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "rust-clock"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d0bcd86495988d3d245d701dc68ce9b10c2b98c0732049f53f55da3c8643297c"
+
+[[package]]
 name = "ryu"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -925,6 +917,21 @@ dependencies = [
  "cpuid-bool",
  "digest",
  "opaque-debug",
+]
+
+[[package]]
+name = "simple-retweets"
+version = "0.1.0"
+dependencies = [
+ "dashmap",
+ "egg-mode",
+ "log",
+ "once_cell",
+ "pretty_env_logger",
+ "rust-clock",
+ "serde",
+ "serde_json",
+ "tokio",
 ]
 
 [[package]]
@@ -1102,9 +1109,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-core"
-version = "0.1.12"
+version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b2734b5a028fa697686f16c6d18c2c6a3c7e41513f9a213abb6754c4acb3c8d7"
+checksum = "d593f98af59ebc017c0648f0117525db358745a8894a8d684e185ba3f45954f9"
 dependencies = [
  "lazy_static",
 ]
