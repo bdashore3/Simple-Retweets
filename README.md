@@ -44,14 +44,43 @@ The included systemd service is HIGHLY RECOMMENDED to run this bot in a server. 
 
 The service assumes you're under a user called `simplerts` and the binary is inside a directory called `Simple-Retweets` with the binary name being `simple-retweets`.
 
-Copy the simplerts.service file into /etc/systemd/system/simplerts.service. Then, run these commands
+### Service Setup
+
+Copy the simplerts.service file into /etc/systemd/system/simplerts.service.
+
+This service makes use of the linux TTY virtual terminals to authenticate as a twitter user as indicated within [this line](https://github.com/bdashore3/Simple-Retweets/blob/master/systemd/simplerts.service#L16) of the file.
+
+To get the appropriate TTY number, run `sudo fgconsole -n` and replace the `dev/tty3` path with that number.
+
+Then, run these commands
 ```
 sudo systemctl reload-daemon
 sudo systemctl enable simplerts.service
 sudo systemctl start simplerts.service
 ```
 
-Check with:
+### Authentication through TTY
+
+To input the authorization, we must access the TTY added in the systemd service.
+
+You can either remote into the console using `conspy` (Available on most package managers) OR use `chvt` to change into the tty.
+
+To input the authorization pin, use one of the two command to remote in
+
+```
+For Conspy
+sudo conspy <TTY number>
+```
+```
+For chvt
+sudo chvt <TTY number>
+```
+
+Conspy is recommended because it shows the actual remote terminal on the existing window, but use chvt if you can't use conspy. 
+
+From there, follow the prompts on the TTY terminal.
+
+### Check if the service works
 ```
 sudo systemctl status simplerts.service
 sudo journalctl -u simplerts -f
@@ -63,7 +92,7 @@ It's easy! All you have to do is delete the bot directory and the systemd file f
 
 # Developers and Permissions
 
-Currently, this bot is allowed for use outside of the developer's server. I try to make the comments as detailed as possible, but if you don't understand something, please contact me via the Discord server! I'm always happy to talk!
+Currently, this bot is allowed for use outside of the developer's server. I try to make the comments as detailed as possible, but if you don't understand something, please contact me via the Discord server or Twitter! I'm always happy to talk!
 
 Creator/Developer: Brian Dashore
 
@@ -72,3 +101,4 @@ Developer Twitter: [@kingbri1st](https://twitter.com/kingbri1st)
 Developer Discord: kingbri#6666
 
 Join the support discord here (get the king-updates role to access the channel): [https://discord.gg/pswt7by](https://discord.gg/pswt7by)
+
