@@ -47,7 +47,7 @@ async fn main() -> BotResult<()> {
     println!("{} \n", informative_string);
     
     tokio::spawn(async move {
-        delay_for(Duration::from_secs(30)).await;
+        delay_for(Duration::from_secs(43200)).await;
         clear_cache().await
     });
 
