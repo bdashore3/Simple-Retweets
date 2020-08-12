@@ -6,7 +6,7 @@ use std::{
     env,
     sync::Arc
 };
-use egg_mode::tweet::{retweet, mentions_timeline};
+use egg_mode::tweet::{retweet, mentions_timeline, like};
 use tokio::time::delay_for;
 use dashmap::DashMap;
 use once_cell::sync::Lazy;
@@ -18,8 +18,10 @@ static TWEET_MAP: Lazy<Arc<DashMap<u64, u64>>> = Lazy::new(|| {
     Arc::new(tweet_map)
 });
 
+pub type BotResult<T> = Result<T, Box<dyn std::error::Error>>;
+
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> BotResult<()> {
     pretty_env_logger::init();
 
     let args: Vec<String> = env::args().collect();
@@ -82,8 +84,12 @@ async fn perform_retweet(config: &Config) {
                     TWEET_MAP.remove(&status.id);
                 }
             } else {
-                let _ = retweet(status.id, &config.token).await;
-                TWEET_MAP.insert(status.id, since_epoch + 3600);
+                if status.in_reply_to_status_id.is_none() {
+                    let _ = retweet(status.id, &config.token).await;
+                    let _ = like(status.id, &config.token).await;
+
+                    TWEET_MAP.insert(status.id, since_epoch + 3600);
+                }
             }
         }
         delay_for(Duration::from_secs(config.rt_delay)).await;
@@ -94,7 +100,7 @@ async fn perform_retweet(config: &Config) {
  * If there are any remaining cached tweets, flush them out.
  * This function is rarely used on smaller retweet accounts with longer delays
  */
- async fn clear_cache() {
+async fn clear_cache() {
     loop {
         let start = SystemTime::now();
         let since_epoch = start.duration_since(UNIX_EPOCH).expect("Time went backwards?").as_secs();
