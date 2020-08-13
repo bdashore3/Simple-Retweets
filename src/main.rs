@@ -6,7 +6,10 @@ use std::{
     env,
     sync::Arc
 };
-use egg_mode::tweet::{retweet, mentions_timeline, like};
+use egg_mode::{
+    tweet::{retweet, mentions_timeline, like},
+    user::{relation_lookup, Connection}
+};
 use tokio::time::delay_for;
 use dashmap::DashMap;
 use once_cell::sync::Lazy;
@@ -51,7 +54,7 @@ async fn main() -> BotResult<()> {
         clear_cache().await
     });
 
-    perform_retweet(&config).await;
+    perform_retweet(&config).await?;
 
     Ok(())
 }
@@ -64,7 +67,7 @@ async fn main() -> BotResult<()> {
  *
  * Doing this prevents rate limiting when a user wants to poll the API every few seconds
  */
-async fn perform_retweet(config: &Config) {
+async fn perform_retweet(config: &Config) -> BotResult<()> {
     loop {
         let mentions = mentions_timeline(&config.token).with_page_size(config.page_size);
         let (_mentions, feed) = match mentions.start().await {
@@ -85,15 +88,22 @@ async fn perform_retweet(config: &Config) {
                 }
             } else {
                 if status.in_reply_to_status_id.is_none() {
-                    let _ = retweet(status.id, &config.token).await;
-                    let _ = like(status.id, &config.token).await;
+                    let other_user = status.user.as_ref().unwrap();
+                    let lookup = relation_lookup([other_user.id].iter().cloned(), &config.token).await?;
 
-                    TWEET_MAP.insert(status.id, since_epoch + 3600);
+                    if lookup[0].connections.iter().any(|c| matches!(c, &Connection::FollowedBy)) {
+                        let _ = retweet(status.id, &config.token).await;
+                        let _ = like(status.id, &config.token).await;
+    
+                        TWEET_MAP.insert(status.id, since_epoch + 3600);
+                    }
                 }
             }
         }
         delay_for(Duration::from_secs(config.rt_delay)).await;
     }
+
+    Ok(())
 }
 
 /*
